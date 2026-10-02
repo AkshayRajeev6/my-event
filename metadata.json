@@ -1,0 +1,11 @@
+{
+  "name": "Book My Event",
+  "description": "Production-grade Event Invitation and Live RSVP Management platform featuring bespoke Guest views, Google Contacts integration & guest import/sync, interactive Google Slides Media Showcase for event highlights & photo galleries, ambient background music & celebratory RSVP audio chimes, single-page printable physical invitation mailers, Google Calendar event scheduling & attendee sync, Google Forms creation & bidirectional response sync, Gmail broadcast & RSVP email dispatch, Google Maps route navigation, Add to Calendar (.ics, Google, Apple, Outlook), and a private Host Admin Dashboard with dietary metrics.",
+  "requestFramePermissions": [
+    "geolocation",
+    "camera"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

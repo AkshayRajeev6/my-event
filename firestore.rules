@@ -1,0 +1,75 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function isValidEvent(data) {
+      return data.id is string && isValidId(data.id)
+        && data.title is string && data.title.size() > 0 && data.title.size() <= 200
+        && data.hosts is string && data.hosts.size() > 0 && data.hosts.size() <= 150
+        && data.date is string && data.date.size() >= 4 && data.date.size() <= 50
+        && data.venue is string && data.venue.size() > 0 && data.venue.size() <= 200
+        && (!('time' in data) || (data.time is string && data.time.size() <= 30))
+        && (!('map' in data) || (data.map is string && data.map.size() <= 500))
+        && (!('pin' in data) || (data.pin is string && data.pin.size() <= 20))
+        && (!('category' in data) || (data.category is string && data.category.size() <= 100))
+        && (!('hostEmail' in data) || (data.hostEmail is string && data.hostEmail.size() <= 200))
+        && (!('whatsapp' in data) || (data.whatsapp is string && data.whatsapp.size() <= 50))
+        && (!('slidesUrl' in data) || (data.slidesUrl is string && data.slidesUrl.size() <= 1000))
+        && (!('image' in data) || (data.image is string && data.image.size() <= 1500))
+        && (!('message' in data) || (data.message is string && data.message.size() <= 3000))
+        && (!('createdAt' in data) || (data.createdAt is string && data.createdAt.size() <= 50))
+        && (!('lat' in data) || data.lat is number)
+        && (!('lng' in data) || data.lng is number)
+        && (!('googleFormUrl' in data) || (data.googleFormUrl is string && data.googleFormUrl.size() <= 1000))
+        && (!('googleFormResponderUri' in data) || (data.googleFormResponderUri is string && data.googleFormResponderUri.size() <= 1000))
+        && (!('googleFormId' in data) || (data.googleFormId is string && data.googleFormId.size() <= 200))
+        && (!('googleFormTitle' in data) || (data.googleFormTitle is string && data.googleFormTitle.size() <= 300))
+        && (!('googleFormLastSynced' in data) || (data.googleFormLastSynced is string && data.googleFormLastSynced.size() <= 60))
+        && (!('googleCalendarEventId' in data) || (data.googleCalendarEventId is string && data.googleCalendarEventId.size() <= 500))
+        && (!('googleCalendarHtmlLink' in data) || (data.googleCalendarHtmlLink is string && data.googleCalendarHtmlLink.size() <= 1000))
+        && (!('googleCalendarSyncedAt' in data) || (data.googleCalendarSyncedAt is string && data.googleCalendarSyncedAt.size() <= 60))
+        && (!('googleCalendarAttendeesCount' in data) || data.googleCalendarAttendeesCount is number);
+    }
+
+    function isValidRsvp(data) {
+      return data.id is string && isValidId(data.id)
+        && data.name is string && data.name.size() > 0 && data.name.size() <= 120
+        && data.phone is string && data.phone.size() > 0 && data.phone.size() <= 30
+        && (data.status == 'Attending' || data.status == 'Declined' || data.status == 'Invited')
+        && data.headcount is number && data.headcount >= 0 && data.headcount <= 50
+        && (data.food == 'Vegetarian' || data.food == 'Non-Vegetarian' || data.food == 'N/A')
+        && (!('email' in data) || (data.email is string && data.email.size() <= 200))
+        && (!('adults' in data) || (data.adults is number && data.adults >= 0 && data.adults <= 50))
+        && (!('children' in data) || (data.children is number && data.children >= 0 && data.children <= 50))
+        && (!('source' in data) || (data.source is string && data.source.size() <= 50))
+        && (!('notes' in data) || (data.notes is string && data.notes.size() <= 1000))
+        && (!('timestamp' in data) || (data.timestamp is string && data.timestamp.size() <= 50));
+    }
+
+    match /events/{eventId} {
+      allow get: if isValidId(eventId);
+      allow list: if false;
+      allow create, update: if isValidId(eventId) && isValidEvent(incoming());
+      allow delete: if false;
+
+      match /rsvps/{rsvpId} {
+        allow get: if isValidId(eventId) && isValidId(rsvpId);
+        allow list: if isValidId(eventId);
+        allow create, update: if isValidId(eventId) && isValidId(rsvpId) && isValidRsvp(incoming());
+        allow delete: if isValidId(eventId) && isValidId(rsvpId);
+      }
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

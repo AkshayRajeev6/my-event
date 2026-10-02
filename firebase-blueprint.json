@@ -1,0 +1,55 @@
+{
+  "entities": {
+    "Event": {
+      "title": "Event",
+      "description": "Bespoke event invitation details created by a host.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique event identifier" },
+        "category": { "type": "string", "description": "Category of the event" },
+        "title": { "type": "string", "description": "Event celebration title", "maxLength": 200 },
+        "hosts": { "type": "string", "description": "Host name(s)", "maxLength": 150 },
+        "date": { "type": "string", "description": "Event date in YYYY-MM-DD format" },
+        "time": { "type": "string", "description": "Event start time in HH:MM format" },
+        "pin": { "type": "string", "description": "Host secret PIN to protect management dashboard", "maxLength": 10 },
+        "venue": { "type": "string", "description": "Venue name", "maxLength": 200 },
+        "map": { "type": "string", "description": "Venue address or Google Maps destination", "maxLength": 500 },
+        "image": { "type": "string", "description": "Cover banner image URL" },
+        "whatsapp": { "type": "string", "description": "Host WhatsApp phone number" },
+        "slidesUrl": { "type": "string", "description": "Google Slides presentation deck URL or ID", "maxLength": 1000 },
+        "message": { "type": "string", "description": "Welcome message or program schedule", "maxLength": 2000 },
+        "createdAt": { "type": "string", "description": "Creation ISO timestamp" }
+      },
+      "required": ["id", "category", "title", "hosts", "date", "time", "venue", "map", "pin"]
+    },
+    "Rsvp": {
+      "title": "Rsvp",
+      "description": "Guest RSVP attendance response for an event.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique RSVP identifier" },
+        "name": { "type": "string", "description": "Guest full name", "maxLength": 120 },
+        "phone": { "type": "string", "description": "Guest contact number", "maxLength": 30 },
+        "email": { "type": "string", "description": "Guest email address", "maxLength": 200 },
+        "status": { "type": "string", "enum": ["Attending", "Declined", "Invited"], "description": "Attendance status" },
+        "adults": { "type": "number", "description": "Number of adults attending" },
+        "children": { "type": "number", "description": "Number of children attending" },
+        "headcount": { "type": "number", "description": "Total headcount (adults + children)" },
+        "food": { "type": "string", "enum": ["Vegetarian", "Non-Vegetarian", "N/A"], "description": "Meal dietary choice" },
+        "source": { "type": "string", "description": "Origin of response (e.g. Web RSVP, Google Form)", "maxLength": 50 },
+        "timestamp": { "type": "string", "description": "Submission ISO timestamp" }
+      },
+      "required": ["id", "name", "phone", "status", "headcount", "food", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/events/{eventId}": {
+      "schema": "Event",
+      "description": "Collection of bespoke event invitation configurations."
+    },
+    "/events/{eventId}/rsvps/{rsvpId}": {
+      "schema": "Rsvp",
+      "description": "Subcollection of guest RSVP responses for a specific event."
+    }
+  }
+}
